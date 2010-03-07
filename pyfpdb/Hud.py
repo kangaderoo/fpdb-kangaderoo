@@ -457,13 +457,11 @@ class Hud:
             updateFlag = False
             (width, height) = self.table.gdkhandle.get_size()
             if self.table.width != width or self.table.height != height:
-                print "%s %s" % (width, height)
                 self.table.width = width
                 self.table.height = height
                 updateFlag = True
             (x, y) = self.table.gdkhandle.get_origin()
             if self.table.x != x or self.table.y != y:
-                print "%s %s" % (x, y)
                 self.table.x = x
                 self.table.y = y
                 self.main_window.move(x, y)
