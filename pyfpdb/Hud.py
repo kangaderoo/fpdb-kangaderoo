@@ -453,15 +453,14 @@ class Hud:
         widthbase = self.config.supported_sites[self.table.site].layout[self.max].width
         heightbase = self.config.supported_sites[self.table.site].layout[self.max].height
         if self.table.gdkhandle is not None:
-            self.table.gdkhandle = gtk.gdk.window_foreign_new(int(self.table.number)) # gtk handle refresh for the size
+            # self.table.gdkhandle = gtk.gdk.window_foreign_new(int(self.table.number)) # gtk handle refresh for the size
             updateFlag = False
-            (width, height) = self.table.gdkhandle.get_size()
+            (x, y, width, height, depth) = self.table.gdkhandle.get_geometry()
             if self.table.width != width or self.table.height != height:
                 self.table.width = width
                 self.table.height = height
                 updateFlag = True
-            (x, y) = self.table.gdkhandle.get_origin()
-            if self.table.x != x or self.table.y != y:
+\            if self.table.x != x or self.table.y != y:
                 self.table.x = x
                 self.table.y = y
                 self.main_window.move(x, y)
