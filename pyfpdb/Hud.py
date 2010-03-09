@@ -460,7 +460,7 @@ class Hud:
                 self.table.width = width
                 self.table.height = height
                 updateFlag = True
-\            if self.table.x != x or self.table.y != y:
+            if self.table.x != x or self.table.y != y:
                 self.table.x = x
                 self.table.y = y
                 self.main_window.move(x, y)
