@@ -457,6 +457,11 @@ class Hud:
         if self.table.gdkhandle is not None:
             # self.table.gdkhandle = gtk.gdk.window_foreign_new(int(self.table.number)) # gtk handle refresh for the size
             updateFlag = False
+            actual_seat = self.get_actual_seat(self.config.supported_sites[self.table.site].screen_name)
+            if self.table.hud != actual_seat:
+                self.table.hud = actual_seat
+                updateFlag = True
+                # dont know what the intention of table.hud was, so misusing the variable here
             (x, y, width, height, depth) = self.table.gdkhandle.get_geometry()
             if self.table.width != width or self.table.height != height:
                 self.table.width = width
