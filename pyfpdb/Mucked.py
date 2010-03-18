@@ -354,19 +354,23 @@ class Aux_Seats(Aux_Window):
     def update_card_positions(self):
         # self.adj does not exist until .create() has been run
         try:
-            adj = self.adj
+            #adj = self.adj
+            adj = self.hud.adj_seats(0, self.config)  # move adj_seats to aux and get rid of it in Hud.py
         except AttributeError:
             return
         loc = self.config.get_aux_locations(self.params['name'], int(self.hud.max))
         width = self.hud.table.width
         height = self.hud.table.height
 
+        widthbase = self.config.supported_sites[self.hud.table.site].layout[self.hud.max].width
+        heightbase = self.config.supported_sites[self.hud.table.site].layout[self.hud.max].height
+
         for i in (range(1, self.hud.max + 1) + ['common']):
             if i == 'common':
                 (x, y) = self.params['layout'][self.hud.max].common
             else:
                 (x, y) = loc[adj[i]]
-            self.positions[i] = self.card_positions((x * width) / 1000, self.hud.table.x, (y * height) /1000, self.hud.table.y)       
+            self.positions[i] = self.card_positions((x * width) / widthbase, self.hud.table.x, (y * height) /heightbase, self.hud.table.y)       
             self.m_windows[i].move(self.positions[i][0], self.positions[i][1])
 
     def create(self):
@@ -376,6 +380,8 @@ class Aux_Seats(Aux_Window):
         self.m_windows = {}      # windows to put the card images in
         width = self.hud.table.width
         height = self.hud.table.height
+        widthbase = self.config.supported_sites[self.hud.table.site].layout[self.hud.max].width
+        heightbase = self.config.supported_sites[self.hud.table.site].layout[self.hud.max].height
         for i in (range(1, self.hud.max + 1) + ['common']):           
             if i == 'common':
                 (x, y) = self.params['layout'][self.hud.max].common
@@ -387,7 +393,7 @@ class Aux_Seats(Aux_Window):
             self.m_windows[i].set_transient_for(self.hud.main_window)
             self.m_windows[i].set_focus_on_map(False)
             self.m_windows[i].connect("configure_event", self.configure_event_cb, i)
-            self.positions[i] = self.card_positions((x * width) / 1000, self.hud.table.x, (y * height) /1000, self.hud.table.y)
+            self.positions[i] = self.card_positions((x * width) / widthbase, self.hud.table.x, (y * height) /heightbase, self.hud.table.y)
             self.m_windows[i].move(self.positions[i][0], self.positions[i][1])
             if self.params.has_key('opacity'):
                 self.m_windows[i].set_opacity(float(self.params['opacity']))
@@ -431,11 +437,14 @@ class Aux_Seats(Aux_Window):
 #        print "adj =", self.adj
         witdh = self.hud.table.width
         height = self.hud.table.height
+        widthbase = self.config.supported_sites[self.hud.table.site].layout[self.hud.max].width
+        heightbase = self.config.supported_sites[self.hud.table.site].layout[self.hud.max].height
+
         for (i, pos) in self.positions.iteritems():
              if i != 'common':
-                new_locs[self.adj[int(i)]] = ((pos[0] - self.hud.table.x) * 1000 / witdh, (pos[1] - self.hud.table.y) * 1000 / height)
+                new_locs[self.adj[int(i)]] = ((pos[0] - self.hud.table.x) * widthbase / witdh, (pos[1] - self.hud.table.y) * heightbase / height)
              else:
-                new_locs[i] = ((pos[0] - self.hud.table.x) * 1000 / witdh, (pos[1] - self.hud.table.y) * 1000 / height)
+                new_locs[i] = ((pos[0] - self.hud.table.x) * widthbase / witdh, (pos[1] - self.hud.table.y) * heightbase / height)
         self.config.edit_aux_layout(self.params['name'], self.hud.max, locations = new_locs)
 
     def configure_event_cb(self, widget, event, i, *args):
