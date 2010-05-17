@@ -79,7 +79,10 @@ class GuiTableViewer (threading.Thread):
         #then the data rows
         for player in range(len(self.player_names)):
             tmp=[]
-            p_name = Charset.to_gui(self.player_names[player][0])
+            if Charset.hex_coding:
+                p_name = self.player_names[player][0]
+            else:
+                p_name = Charset.to_gui(self.player_names[player][0])
             tmp.append(p_name)
             
             seatCount=len(self.player_names)

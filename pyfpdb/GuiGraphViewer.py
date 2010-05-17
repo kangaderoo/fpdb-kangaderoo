@@ -147,7 +147,10 @@ class GuiGraphViewer (threading.Thread):
             for site in sites:
                 if sites[site] == True:
                     sitenos.append(siteids[site])
-                    _hname = Charset.to_utf8(heroes[site])
+                    if Charset.hex_coding:
+                        _hname = heroes[site]
+                    else:
+                        _hname = Charset.to_utf8(heroes[site])
                     result = self.db.get_player_id(self.conf, site, _hname)
                     if result is not None:
                         playerids.append(int(result))

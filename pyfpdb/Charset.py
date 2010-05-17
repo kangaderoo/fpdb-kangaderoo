@@ -27,10 +27,30 @@ import Configuration
 encoder_to_utf = codecs.lookup('utf-8')
 encoder_to_sys = codecs.lookup(Configuration.LOCALE_ENCODING)
 
+coder_hex = codecs.lookup('hex_codec')
+
+
 # I'm saving a few cycles with this one
 not_needed1, not_needed2, not_needed3 = False, False, False
+hex_coding = True
 if Configuration.LOCALE_ENCODING == 'UTF8':
     not_needed1, not_needed2, not_needed3 = True, True, True
+
+def to_hex(s):
+    try:
+        out = coder_hex.encode(s)[0]
+        return out
+    except UnicodeDecodeError:
+        sys.stderr.write('Could not convert: "%s"\n' % s)
+        return s
+          
+def from_hex(s):
+    try:
+        out = coder_hex.decode(s)[0]
+        return out
+    except UnicodeDecodeError:
+        sys.stderr.write('Could not convert: "%s"\n' % s)
+        return s
 
 def to_utf8(s):
     if not_needed1: return s

@@ -183,7 +183,10 @@ class GuiSessionViewer (threading.Thread):
             if sites[site] == True:
                 sitenos.append(siteids[site])
                 _q = self.sql.query['getPlayerId']
-                _name = Charset.to_utf8(heroes[site])
+                if Charset.hex_coding:
+                    _name = heroes[site]
+                else:
+                    _name = Charset.to_utf8(heroes[site])
                 #print 'DEBUG(_name) :: %s' % _name
                 self.cursor.execute(_q, (_name,)) # arg = tuple
                 result = self.db.cursor.fetchall()

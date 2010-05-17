@@ -193,7 +193,10 @@ class GuiPlayerStats (threading.Thread):
         for site in sites:
             if sites[site] == True:
                 sitenos.append(siteids[site])
-                _hname = Charset.to_utf8(heroes[site])
+                if Charset.hex_coding:
+                    _hname = heroes[site]
+                else:
+                    _hname = Charset.to_utf8(heroes[site])
                 result = self.db.get_player_id(self.conf, site, _hname)
                 if result is not None:
                     playerids.append(int(result))
@@ -399,6 +402,8 @@ class GuiPlayerStats (threading.Thread):
             for col,column in enumerate(self.cols_to_show):
                 if column[colalias] in colnames:
                     value = result[sqlrow][colnames.index(column[colalias])]
+                    if column[colalias] == 'pname' and Charset.hex_coding:
+                        value = Charset.from_hex(value)
                     if column[colalias] == 'plposition':
                         if value == 'B':
                             value = 'BB'

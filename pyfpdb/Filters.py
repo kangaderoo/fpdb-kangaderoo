@@ -302,7 +302,10 @@ class Filters(threading.Thread):
         completion.set_text_column(0)
         names = self.db.get_player_names(self.conf, self.siteid[site])  # (config=self.conf, site_id=None, like_player_name="%")
         for n in names: # list of single-element "tuples"
-            _n = Charset.to_gui(n[0])
+            if Charset.hex_coding:
+                _n = Charset.from_hex(n[0])
+            else:
+                _n = Charset.to_gui(n[0])
             _nt = (_n, )
             liststore.append(_nt)
 
@@ -311,7 +314,10 @@ class Filters(threading.Thread):
     def __set_hero_name(self, w, site):
         _name = w.get_text()
         # get_text() returns a str but we want internal variables to be unicode:
-        _guiname = unicode(_name)
+        if Charset.hex_coding:
+            _guiname = _name
+        else:
+            _guiname = unicode(_name)
         self.heroes[site] = _guiname
 #        log.debug("setting heroes[%s]: %s"%(site, self.heroes[site]))
 
@@ -518,7 +524,10 @@ class Filters(threading.Thread):
             vbox1.pack_start(hBox, False, True, 0)
 
             player = self.conf.supported_sites[site].screen_name
-            _pname = Charset.to_gui(player)
+            if Charset.hex_coding:
+                _pname = player
+            else:     
+                _pname = Charset.to_gui(player)
             self.createPlayerLine(hBox, site, _pname)
 
         if "GroupsAll" in display and display["GroupsAll"] == True:

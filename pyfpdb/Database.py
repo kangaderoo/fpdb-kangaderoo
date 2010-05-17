@@ -738,7 +738,10 @@ class Database:
             if (playerid == hero_id and h_hud_style != 'S') or (playerid != hero_id and hud_style != 'S'):
                 t_dict = {}
                 for name, val in zip(colnames, row):
-                    t_dict[name.lower()] = val
+                    if Charset.hex_coding and name.lower() == 'screen_name':
+                        t_dict[name.lower()] = Charset.from_hex(val)
+                    else:
+                        t_dict[name.lower()] = val
 #                    print t_dict
                 stat_dict[t_dict['player_id']] = t_dict
 
@@ -783,9 +786,15 @@ class Database:
                     for name, val in zip(colnames, row):
                         if not playerid in stat_dict:
                             stat_dict[playerid] = {}
-                            stat_dict[playerid][name.lower()] = val
+                            if Charset.hex_coding and name.lower() == 'screen_name':
+                                stat_dict[playerid][name.lower()] = Charset.from_hex(val)
+                            else:
+                                stat_dict[playerid][name.lower()] = val
                         elif not name.lower() in stat_dict[playerid]:
-                            stat_dict[playerid][name.lower()] = val
+                            if Charset.hex_coding and name.lower() == 'screen_name':
+                                stat_dict[playerid][name.lower()] = Charset.from_hex(val)
+                            else:
+                                stat_dict[playerid][name.lower()] = val
                         elif name.lower() not in ('hand_id', 'player_id', 'seat', 'screen_name', 'seats'):
                             #print "DEBUG: stat_dict[%s][%s]: %s" %(playerid, name.lower(), val)
                             stat_dict[playerid][name.lower()] += val
@@ -804,7 +813,10 @@ class Database:
     def get_player_id(self, config, site, player_name):
         c = self.connection.cursor()
         #print "get_player_id: player_name =", player_name, type(player_name)
-        p_name = Charset.to_utf8(player_name)
+        if Charset.hex_coding:
+            p_name = Charset.to_hex(player_name)
+        else:
+            p_name = Charset.to_utf8(player_name)
         c.execute(self.sql.query['get_player_id'], (p_name, site))
         row = c.fetchone()
         if row:
@@ -818,7 +830,10 @@ class Database:
         if site_id is None:
             site_id = -1
         c = self.get_cursor()
-        p_name = Charset.to_utf8(like_player_name)
+        if Charset.hex_coding and like_player_name != "%":
+            p_name = Charset.to_hex(like_player_name)
+        else:
+            p_name = Charset.to_utf8(like_player_name)
         c.execute(self.sql.query['get_player_names'], (p_name, site_id, site_id))
         rows = c.fetchall()
         return rows
@@ -1782,7 +1797,10 @@ class Database:
 
     def insertPlayer(self, name, site_id):
         result = None
-        _name = Charset.to_db_utf8(name)
+        if Charset.hex_coding:
+            _name = Charset.to_hex(name)
+        else:
+            _name = Charset.to_db_utf8(name)
         c = self.get_cursor()
         q = "SELECT name, id FROM Players WHERE siteid=%s and name=%s"
         q = q.replace('%s', self.sql.query['placeholder'])
