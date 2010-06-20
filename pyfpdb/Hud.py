@@ -453,18 +453,36 @@ class Hud:
                 #table.name is only a valid handle for ring games ! we are not killing tourney tables here.
                 return False
         # anyone know how to do this in unix, or better yet, trap the X11 error that is triggered when executing the get_origin() for a closed window?
+        widthbase = self.config.supported_sites[self.table.site].layout[self.max].width
+        heightbase = self.config.supported_sites[self.table.site].layout[self.max].height
         if self.table.gdkhandle is not None:
-            (x, y) = self.table.gdkhandle.get_origin()
+            # self.table.gdkhandle = gtk.gdk.window_foreign_new(int(self.table.number)) # gtk handle refresh for the size
+            updateFlag = False
+            actual_seat = self.get_actual_seat(self.config.supported_sites[self.table.site].screen_name)
+            if self.table.hud != actual_seat:
+                self.table.hud = actual_seat
+                updateFlag = True
+                # dont know what the intention of table.hud was, so misusing the variable here
+            (x, y, width, height, depth) = self.table.gdkhandle.get_geometry()
+            if self.table.width != width or self.table.height != height:
+                self.table.width = width
+                self.table.height = height
+                updateFlag = True
             if self.table.x != x or self.table.y != y:
                 self.table.x = x
                 self.table.y = y
+                # self.main_window.move(x, y)
                 self.main_window.move(x + self.site_params['xshift'], y + self.site_params['yshift'])
+                updateFlag = True
+            if updateFlag:
                 adj = self.adj_seats(self.hand, self.config)
                 loc = self.config.get_locations(self.table.site, self.max)
                 # TODO: is stat_windows getting converted somewhere from a list to a dict, for no good reason?
                 for i, w in enumerate(self.stat_windows.itervalues()):
                     (x, y) = loc[adj[i+1]]
-                    w.relocate(x, y)
+                    px = int(x * self.table.width  / widthbase)
+                    py = int(y * self.table.height / heightbase)
+                    w.relocate(px, py)
 
                 # While we're at it, fix the positions of mucked cards too
                 for aux in self.aux_windows:
@@ -514,9 +532,11 @@ class Hud:
 
     def save_layout(self, *args):
         new_layout = [(0, 0)] * self.max
+        widthbase = self.config.supported_sites[self.table.site].layout[self.max].width
+        heightbase = self.config.supported_sites[self.table.site].layout[self.max].height
         for sw in self.stat_windows:
-            loc = self.stat_windows[sw].window.get_position()
-            new_loc = (loc[0] - self.table.x, loc[1] - self.table.y)
+            (x,y) = self.stat_windows[sw].window.get_position()
+            new_loc = (int((x - self.table.x)*widthbase/self.table.width), int((y - self.table.y)*heightbase/self.table.height))
             new_layout[self.stat_windows[sw].adj - 1] = new_loc
         self.config.edit_layout(self.table.site, self.max, locations = new_layout)
 #    ask each aux to save its layout back to the config object
@@ -580,14 +600,18 @@ class Hud:
 #    create the stat windows
         for i in xrange(1, self.max + 1):
             (x, y) = loc[adj[i]]
+            widthbase = self.config.supported_sites[self.table.site].layout[self.max].width
+            heightbase = self.config.supported_sites[self.table.site].layout[self.max].height
+            px = int(x * self.table.width  / widthbase)
+            py = int(y * self.table.height / heightbase)
             if i in self.stat_windows:
                 self.stat_windows[i].relocate(x, y)
             else:
                 self.stat_windows[i] = Stat_Window(game = config.supported_games[self.poker_game],
                                                parent = self,
                                                table = self.table,
-                                               x = x,
-                                               y = y,
+                                               x = px,
+                                               y = py,
                                                seat = i,
                                                adj = adj[i],
                                                player_id = 'fake',
