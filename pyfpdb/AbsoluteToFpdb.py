@@ -18,6 +18,8 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ########################################################################
 
+#Note that this filter also supports UltimateBet, they are both owned by the same company and form the Cereus Network
+
 import L10n
 _ = L10n.get_translation()
 
@@ -193,12 +195,11 @@ class Absolute(HandHistoryConverter):
 
         if m is None or fname_info is None:
             if m is None:
-                logging.info(_("Didn't match re_HandInfo"))
-                logging.info(hand.handText)
+                logging.error(_("Didn't match re_HandInfo"))
+                logging.error(hand.handText)
             elif fname_info is None:
                 logging.info(_("File name didn't match re_*InfoFromFilename"))
                 logging.info(_("File name: %s") % self.in_path)
-            return None
         logging.debug("HID %s, Table %s" % (m.group('HID'),  m.group('TABLE')))
         hand.handid =  m.group('HID')
         if m.group('TABLE'):
