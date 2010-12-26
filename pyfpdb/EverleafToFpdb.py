@@ -106,7 +106,10 @@ or None if we fail to get the info """
 
         m = self.re_GameInfo.search(handText)
         if not m:
-            return None
+            tmp = handText[0:100]
+            log.error(_("determineGameType: Unable to recognise gametype from: '%s'") % tmp)
+            log.error(_("determineGameType: Raising FpdbParseError"))
+            raise FpdbParseError(_("Unable to recognise gametype from: '%s'") % tmp)
 
         mg = m.groupdict()
 
@@ -145,7 +148,7 @@ or None if we fail to get the info """
         logging.debug("HID %s, Table %s" % (m.group('HID'),  m.group('TABLE')))
         hand.handid =  m.group('HID')
         hand.tablename = m.group('TABLE')
-        hand.maxseats = 6     # assume 6-max unless we have proof it's a larger/smaller game, since everleaf doesn't give seat max info
+        hand.maxseats = 4     # assume 4-max unless we have proof it's a larger/smaller game, since everleaf doesn't give seat max info
         
         currencies = { u'€':'EUR', '$':'USD', '':'T$', None:'T$' }
         mg = m.groupdict()
@@ -179,6 +182,8 @@ or None if we fail to get the info """
             elif seatnum > 6:
                 hand.maxseats = 8 # everleaf currently does 2/6/10 games, so if seats > 6 are in use, it must be 10-max.
                 # TODO: implement lookup list by table-name to determine maxes, then fall back to 6 default/10 here, if there's no entry in the list?
+            elif seatnum > 4:
+                hand.maxseats = 6 # they added 4-seat games too!
 
 
     def markStreets(self, hand):

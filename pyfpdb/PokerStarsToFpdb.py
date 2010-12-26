@@ -57,9 +57,11 @@ class PokerStars(HandHistoryConverter):
                        '20.00': ('5.00', '10.00'),     '20': ('5.00', '10.00'),
                        '30.00': ('10.00', '15.00'),    '30': ('10.00', '15.00'),
                        '60.00': ('15.00', '30.00'),    '60': ('15.00', '30.00'),
+                       '80.00': ('20.00', '40.00'),    '80': ('20.00', '40.00'),
                       '100.00': ('25.00', '50.00'),   '100': ('25.00', '50.00'),
                       '200.00': ('50.00', '100.00'),  '200': ('50.00', '100.00'),
                       '400.00': ('100.00', '200.00'), '400': ('100.00', '200.00'),
+                      '800.00': ('200.00', '400.00'), '800': ('200.00', '400.00'),
                      '1000.00': ('250.00', '500.00'),'1000': ('250.00', '500.00')
                   }
 
@@ -99,7 +101,9 @@ class PokerStars(HandHistoryConverter):
           (?P<BB>[.0-9]+)
           (?P<BLAH>\s-\s[%(LS)s\d\.]+\sCap\s-\s)?        # Optional Cap part
           \s?(?P<ISO>%(LEGAL_ISO)s)?
-          \)\s-\s                        # close paren of the stakes
+          \)                        # close paren of the stakes
+          (?P<BLAH2>\s\[AAMS\sID:\s[A-Z0-9]+\])?         # AAMS ID: in .it HH's
+          \s-\s
           (?P<DATETIME>.*$)
         """ % substitutions, re.MULTILINE|re.VERBOSE)
 
@@ -151,7 +155,7 @@ class PokerStars(HandHistoryConverter):
                         (\scards?(\s\[(?P<DISCARDED>.+?)\])?)?\s*$"""
                          %  subst, re.MULTILINE|re.VERBOSE)
             self.re_ShowdownAction   = re.compile(r"^%s: shows \[(?P<CARDS>.*)\]" %  player_re, re.MULTILINE)
-            self.re_CollectPot       = re.compile(r"Seat (?P<SEAT>[0-9]+): %(PLYR)s (\(button\) |\(small blind\) |\(big blind\) |\(button\) \(small blind\) )?(collected|showed \[.*\] and won) \(%(CUR)s(?P<POT>[.\d]+)\)(, mucked| with.*|)" %  subst, re.MULTILINE)
+            self.re_CollectPot       = re.compile(r"Seat (?P<SEAT>[0-9]+): %(PLYR)s (\(button\) |\(small blind\) |\(big blind\) |\(button\) \(small blind\) |\(button\) \(big blind\) )?(collected|showed \[.*\] and won) \(%(CUR)s(?P<POT>[.\d]+)\)(, mucked| with.*|)" %  subst, re.MULTILINE)
             self.re_sitsOut          = re.compile("^%s sits out" %  player_re, re.MULTILINE)
             self.re_ShownCards       = re.compile("^Seat (?P<SEAT>[0-9]+): %s (\(.*\) )?(?P<SHOWED>showed|mucked) \[(?P<CARDS>.*)\].*" %  player_re, re.MULTILINE)
 
@@ -171,7 +175,11 @@ class PokerStars(HandHistoryConverter):
                 ["tour", "hold", "fl"],
 
                 ["tour", "stud", "fl"],
-               ]
+                
+                ["tour", "draw", "fl"],
+                ["tour", "draw", "pl"],
+                ["tour", "draw", "nl"],
+                ]
 
     def determineGameType(self, handText):
         info = {}
@@ -258,7 +266,7 @@ class PokerStars(HandHistoryConverter):
                             hand.buyinCurrency="PSFP"
                         else:
                             #FIXME: handle other currencies, FPP, play money
-                            raise FpdbParseError(_("failed to detect currency"))
+                            raise FpdbParseError(_("Failed to detect currency: '%s'" % info[key]))
 
                         info['BIAMT'] = info['BIAMT'].strip(u'$€FPP')
                         
@@ -291,7 +299,7 @@ class PokerStars(HandHistoryConverter):
                     hand.tablename = info[key]
             if key == 'BUTTON':
                 hand.buttonpos = info[key]
-            if key == 'MAX':
+            if key == 'MAX' and info[key] != None:
                 hand.maxseats = int(info[key])
 
             if key == 'MIXED':

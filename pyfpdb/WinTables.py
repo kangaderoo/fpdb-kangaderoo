@@ -59,7 +59,7 @@ class Table(Table_Window):
         for hwnd in titles:
             if titles[hwnd] == "":
                 continue
-            if re.search(self.search_string, titles[hwnd]):
+            if re.search(self.search_string, titles[hwnd], re.I):
                 if self.check_bad_words(titles[hwnd]):
                     continue
                 self.window = hwnd
@@ -76,6 +76,11 @@ class Table(Table_Window):
         self.title = titles[hwnd]
         self.hud = None
         self.number = hwnd
+        if self.gdkhandle is not None:
+            try:   # Windows likes this here - Linux doesn't
+                self.gdkhandle = gtk.gdk.window_foreign_new(self.number)
+            except AttributeError:
+                pass
 
     def get_geometry(self):
         try:

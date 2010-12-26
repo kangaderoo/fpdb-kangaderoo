@@ -495,6 +495,22 @@ class Hud:
 
         return True
 
+    def up_update_table_position(self):
+#    callback for table moved
+
+#    move the stat windows
+        adj = self.adj_seats(self.hand, self.config)
+        loc = self.config.get_locations(self.table.site, self.max)
+        for i, w in enumerate(self.stat_windows.itervalues()):
+            (x, y) = loc[adj[i+1]]
+            w.relocate(x, y)
+#    move the main window
+        self.main_window.move(self.table.x + self.site_params['xshift'], self.table.y + self.site_params['yshift'])
+#    and move any auxs
+        for aux in self.aux_windows:
+            aux.update_card_positions()
+        return True
+
     def on_button_press(self, widget, event):
         if event.button == 1: # if primary button, start movement
             self.main_window.begin_move_drag(event.button, int(event.x_root), int(event.y_root), event.time)
@@ -519,6 +535,16 @@ class Hud:
         for aux in self.aux_windows:
             aux.destroy()
         self.aux_windows = []
+
+    def resize_windows(self, *args):
+        for w in self.stat_windows.itervalues():
+            if type(w) == int:
+                continue
+            rel_x = (w.x - self.table.x) * self.table.width  / self.table.oldwidth
+            rel_y = (w.y - self.table.y) * self.table.height / self.table.oldheight
+            w.x = self.table.x + rel_x
+            w.y = self.table.y + rel_y
+            w.window.move(w.x, w.y) 
 
     def reposition_windows(self, *args):
         self.update_table_position()
@@ -630,8 +656,8 @@ class Hud:
                       [config.supported_games[self.poker_game].stats[stat].col] = \
                       config.supported_games[self.poker_game].stats[stat].stat_name
 
-        if os.name == "nt": # we call update_table_position() regularly in Windows to see if we're moving around.  See comments on that function for why this isn't done in X.
-            gobject.timeout_add(500, self.update_table_position)
+#        if os.name == "nt": # we call update_table_position() regularly in Windows to see if we're moving around.  See comments on that function for why this isn't done in X.
+#            gobject.timeout_add(500, self.update_table_position)
 
     def update(self, hand, config):
         self.hand = hand   # this is the last hand, so it is available later
