@@ -48,8 +48,12 @@ class DerivedStats():
             self.handsplayers[player[1]]['position']            = 2
             self.handsplayers[player[1]]['street0_3BChance']    = False
             self.handsplayers[player[1]]['street0_3BDone']      = False
-            self.handsplayers[player[1]]['street0_4BChance']    = False #FIXME: this might not actually be implemented
-            self.handsplayers[player[1]]['street0_4BDone']      = False #FIXME: this might not actually be implemented
+            self.handsplayers[player[1]]['street0_4BChance']    = False 
+            self.handsplayers[player[1]]['street0_4BDone']      = False 
+            self.handsplayers[player[1]]['street0_FoldTo3BChance']= False
+            self.handsplayers[player[1]]['street0_FoldTo3BDone']= False
+            self.handsplayers[player[1]]['street0_FoldTo4BChance']= False 
+            self.handsplayers[player[1]]['street0_FoldTo4BDone']= False 
             self.handsplayers[player[1]]['raiseFirstInChance']  = False
             self.handsplayers[player[1]]['raisedFirstIn']       = False
             self.handsplayers[player[1]]['foldBbToStealChance'] = False
@@ -441,14 +445,36 @@ class DerivedStats():
         bet_level = 1 # bet_level after 3-bet is equal to 3
         for action in hand.actions[hand.actionStreets[1]]:
             # FIXME: fill other(3|4)BStreet0 - i have no idea what does it mean
-            pname, aggr = action[0], action[1] in ('raises', 'bets')
-            self.handsplayers[pname]['street0_3BChance'] = self.handsplayers[pname]['street0_3BChance'] or bet_level == 2
-            self.handsplayers[pname]['street0_4BChance'] = bet_level == 3
-            self.handsplayers[pname]['street0_3BDone'] =  self.handsplayers[pname]['street0_3BDone'] or (aggr and self.handsplayers[pname]['street0_3BChance'])
-            self.handsplayers[pname]['street0_4BDone'] =  aggr and (self.handsplayers[pname]['street0_4BChance'])
-            if aggr:
-                bet_level += 1
-
+            pname, act, aggr = action[0], action[1], action[1] in ('raises', 'bets')
+            if bet_level == 1:
+                if aggr:
+                    first_agressor = pname
+                    bet_level += 1
+                continue
+            elif bet_level == 2:
+                self.handsplayers[pname]['street0_3BChance'] = True
+                if aggr:
+                    self.handsplayers[pname]['street0_3BDone'] = True
+                    second_agressor = pname
+                    bet_level += 1
+                continue
+            elif bet_level == 3:
+                if pname == first_agressor:
+                    self.handsplayers[pname]['street0_4BChance'] = True
+                    self.handsplayers[pname]['street0_FoldTo3BChance'] = True
+                    if aggr:
+                        self.handsplayers[pname]['street0_4BDone'] = True
+                        bet_level += 1
+                    elif act == 'folds':
+                        self.handsplayers[pname]['street0_FoldTo3BDone'] = True
+                        break
+                continue
+            elif bet_level == 4:
+                if pname == second_agressor: 
+                    self.handsplayers[pname]['street0_FoldTo4BChance'] = True
+                    if act == 'folds':
+                        self.handsplayers[pname]['street0_FoldTo4BDone'] = True
+                    break
 
     def calcCBets(self, hand):
         """Fill streetXCBChance, streetXCBDone, foldToStreetXCBDone, foldToStreetXCBChance

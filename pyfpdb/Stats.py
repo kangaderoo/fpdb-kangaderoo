@@ -442,20 +442,79 @@ def three_B(stat_dict, player):
     """    Three bet preflop/3rd."""
     stat = 0.0
     try:
-        stat = float(stat_dict[player]['tb_0'])/float(stat_dict[player]['tb_opp_0'])
+        stat = float(stat_dict[player]['3b_0'])/float(stat_dict[player]['Tb_opp_0'])
         return (stat,
                 '%3.1f'         % (100.0*stat),
                 '3B=%3.1f%%'    % (100.0*stat),
                 '3B_pf=%3.1f%%' % (100.0*stat),
-                '(%d/%d)'       % (stat_dict[player]['tb_0'], stat_dict[player]['tb_opp_0']),
-                _('% 3/4 Bet preflop/3rd'))
+                '(%d/%d)'       % (stat_dict[player]['3b_0'], stat_dict[player]['Tb_opp_0']),
+                _('% 4 Bet preflop/3rd'))
     except:
         return (stat,
                 'NA',
                 '3B=NA',
                 '3B_pf=NA',
                 '(0/0)',
-                _('% 3/4 Bet preflop/3rd'))
+                _('% 3 Bet preflop/3rd'))
+
+def four_B(stat_dict, player):
+    """    Four bet preflop/4rd."""
+    stat = 0.0
+    try:
+        stat = float(stat_dict[player]['4b_0'])/float(stat_dict[player]['Fb_opp_0'])
+        return (stat,
+                '%3.1f'         % (100.0*stat),
+                '4B=%3.1f%%'    % (100.0*stat),
+                '4B_pf=%3.1f%%' % (100.0*stat),
+                '(%d/%d)'       % (stat_dict[player]['Fb_0'], stat_dict[player]['Fb_opp_0']),
+                _('% 4 Bet preflop/4rd'))
+    except:
+        return (stat,
+                'NA',
+                '4B=NA',
+                '4B_pf=NA',
+                '(0/0)',
+                _('% 4 Bet preflop/4rd'))
+
+def f_3bet(stat_dict, player):
+    """ Fold to 3bet preflop. """
+    stat = 0.0
+    try:
+        stat = float(stat_dict[player]['f3b_0'])/float(stat_dict[player]['f3b_opp_0'])
+        return (stat,
+                '%3.1f'         % (100.0*stat),
+                'F3B=%3.1f%%'    % (100.0*stat),
+                'F3B_pf=%3.1f%%' % (100.0*stat),
+                '(%d/%d)'       % (stat_dict[player]['f3b_0'], stat_dict[player]['f3b_opp_0']),
+                _('% Fold to 3 Bet preflop'))
+    except:
+        return (stat,
+                'NA',
+                'F3B=NA',
+                'F3B_pf=NA',
+                '(0/0)',
+                _('% Fold to 3 Bet preflop'))
+
+def f_4bet(stat_dict, player):
+    """ Fold to 4bet preflop. """
+    stat = 0.0
+    try:
+        stat = float(stat_dict[player]['f4b_0'])/float(stat_dict[player]['f4b_opp_0'])
+        return (stat,
+                '%3.1f'         % (100.0*stat),
+                'F4B=%3.1f%%'    % (100.0*stat),
+                'F4B_pf=%3.1f%%' % (100.0*stat),
+                '(%d/%d)'       % (stat_dict[player]['f4b_0'], stat_dict[player]['f4b_opp_0']),
+                _('% Fold to 4 Bet preflop'))
+    except:
+        return (stat,
+                'NA',
+                'F4B=NA',
+                'F4B_pf=NA',
+                '(0/0)',
+                _('% Fold to 4 Bet preflop'))
+
+
 
 def WMsF(stat_dict, player):
     """    Won $ when saw flop/4th."""
