@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 #Copyright 2008-2010 Steffen Schaumburg
@@ -20,7 +20,7 @@
 import L10n
 _ = L10n.get_translation()
 
-from decimal import Decimal
+from decimal_wrapper import Decimal
 import datetime
 
 from Exceptions import FpdbParseError
