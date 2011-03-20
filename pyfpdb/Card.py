@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Copyright 2008-2010 Carl Gherardi
+#Copyright 2008-2011 Carl Gherardi
 #This program is free software: you can redistribute it and/or modify
 #it under the terms of the GNU Affero General Public License as published by
 #the Free Software Foundation, version 3 of the License.
@@ -98,7 +98,7 @@ def twoStartCardString(card):
         if x == y:  ret = s[x] + s[y]
         elif x > y: ret = s[x] + s[y] + 's'
         else:       ret = s[y] + s[x] + 'o'
-    print "twoStartCardString(", card ,") = " + ret
+    #print "twoStartCardString(", card ,") = " + ret
     return ret
 
 def fourStartCards(value1, suit1, value2, suit2, value3, suit3, value4, suit4):

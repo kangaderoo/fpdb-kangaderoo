@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Copyright 2008-2010 Steffen Schaumburg
+#Copyright 2008-2011 Steffen Schaumburg
 #This program is free software: you can redistribute it and/or modify
 #it under the terms of the GNU Affero General Public License as published by
 #the Free Software Foundation, version 3 of the License.
@@ -200,7 +200,7 @@ class GuiAutoImport (threading.Thread):
         for site in the_sites:
             params = self.config.get_site_parameters(site)
             if params['enabled'] == True:
-                print "DEBUG: Detecting hh directory for site: '%s'" % site
+                print (_("DEBUG: ") + _("Detecting hh directory for site: '%s'") % site)
                 if os.name == 'posix':
                     if self.posix_detect_hh_dirs(site):
                         #data[1].set_text(dia_chooser.get_filename())
@@ -223,15 +223,16 @@ class GuiAutoImport (threading.Thread):
     def startClicked(self, widget, data):
         """runs when user clicks start on auto import tab"""
 
-#    Check to see if we have an open file handle to the HUD and open one if we do not.
-#    bufsize = 1 means unbuffered
-#    We need to close this file handle sometime.
+        # Check to see if we have an open file handle to the HUD and open one if we do not.
+        # bufsize = 1 means unbuffered
+        # We need to close this file handle sometime.
 
-#    TODO:  Allow for importing from multiple dirs - REB 29AUG2008
-#    As presently written this function does nothing if there is already a pipe open.
-#    That is not correct.  It should open another dir for importing while piping the
-#    results to the same pipe.  This means that self.path should be a a list of dirs
-#    to watch.
+        # TODO:  Allow for importing from multiple dirs - REB 29AUG2008
+        # As presently written this function does nothing if there is already a pipe open.
+        # That is not correct.  It should open another dir for importing while piping the
+        # results to the same pipe.  This means that self.path should be a a list of dirs
+        # to watch.
+        
         if data == "autostart" or (widget == self.startButton and self.startButton.get_active()):
             self.startButton.set_active(True)
             # - Does the lock acquisition need to be more sophisticated for multiple dirs?
@@ -313,7 +314,7 @@ class GuiAutoImport (threading.Thread):
     #enabling and disabling sites from this interface not possible
     #expects a box to layout the line horizontally
     def createSiteLine(self, hbox1, hbox2, site, iconpath, hhpath, filter_name, active = True):
-        label = gtk.Label("%s auto-import:" % site)
+        label = gtk.Label(_("%s auto-import:") % site)
         hbox1.pack_start(label, False, False, 3)
         label.show()
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Copyright 2008-2010 Carl Gherardi
+#Copyright 2008-2011 Carl Gherardi
 #This program is free software: you can redistribute it and/or modify
 #it under the terms of the GNU Affero General Public License as published by
 #the Free Software Foundation, version 3 of the License.
@@ -304,14 +304,14 @@ which it expects to find at self.re_TailSplitHands -- see for e.g. Everleaf.py.
             elif gametype['base'] == 'draw':
                 hand = Hand.DrawHand(self.config, self, self.sitename, gametype, handText)
         else:
-            log.error(_("Unsupported game type: %s" % gametype))
-            raise FpdbParseError(_("Unsupported game type: %s" % gametype))
+            log.error(_("Unsupported game type: %s") % gametype)
+            raise FpdbParseError(_("Unsupported game type: %s") % gametype)
 
         if hand:
             #hand.writeHand(self.out_fh)
             return hand
         else:
-            log.error(_("Unsupported game type: %s" % gametype))
+            log.error(_("Unsupported game type: %s") % gametype)
             # TODO: pity we don't know the HID at this stage. Log the entire hand?
 
 
@@ -460,24 +460,8 @@ or None if we fail to get the info """
 
     def sanityCheck(self):
         """Check we aren't going to do some stupid things"""
-        #TODO: the hhbase stuff needs to be in fpdb_import
         sane = False
         base_w = False
-        #~ #Check if hhbase exists and is writable
-        #~ #Note: Will not try to create the base HH directory
-        #~ if not (os.access(self.hhbase, os.W_OK) and os.path.isdir(self.hhbase)):
-            #~ print "HH Sanity Check: Directory hhbase '" + self.hhbase + "' doesn't exist or is not writable"
-        #~ else:
-            #~ #Check if hhdir exists and is writable
-            #~ if not os.path.isdir(self.hhdir):
-                #~ # In first pass, dir may not exist. Attempt to create dir
-                #~ print "Creating directory: '%s'" % (self.hhdir)
-                #~ os.mkdir(self.hhdir)
-                #~ sane = True
-            #~ elif os.access(self.hhdir, os.W_OK):
-                #~ sane = True
-            #~ else:
-                #~ print "HH Sanity Check: Directory hhdir '" + self.hhdir + "' or its parent directory are not writable"
 
         # Make sure input and output files are different or we'll overwrite the source file
         if True: # basically.. I don't know

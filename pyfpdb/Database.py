@@ -4,7 +4,7 @@
 
 Create and manage the database objects.
 """
-#    Copyright 2008-2010, Ray E. Barker
+#    Copyright 2008-2011, Ray E. Barker
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -1116,7 +1116,7 @@ class Database:
             self.connection.set_isolation_level(1)   # go back to normal isolation level
         self.commit() # seems to clear up errors if there were any in postgres
         ptime = time() - stime
-        print _("prepare import took %s seconds" % ptime)
+        print (_("prepare import took %s seconds") % ptime)
     #end def prepareBulkImport
 
     def afterBulkImport(self):
@@ -1169,7 +1169,7 @@ class Database:
         for idx in self.indexes[self.backend]:
             if idx['drop'] == 1:
                 if self.backend == self.MYSQL_INNODB:
-                    print _("Creating mysql index %s %s") % (idx['tab'], idx['col'])
+                    print _("Creating MySQL index %s %s") % (idx['tab'], idx['col'])
                     try:
                         s = "alter table %s add index %s(%s)" % (idx['tab'],idx['col'],idx['col'])
                         c.execute(s)
@@ -1178,7 +1178,7 @@ class Database:
                 elif self.backend == self.PGSQL:
     #                pass
                     # mod to use tab_col for index name?
-                    print _("Creating pg index "), idx['tab'], idx['col']
+                    print _("Creating PostgreSQL index "), idx['tab'], idx['col']
                     try:
                         s = "create index %s_%s_idx on %s(%s)" % (idx['tab'], idx['col'], idx['tab'], idx['col'])
                         c.execute(s)
@@ -1191,7 +1191,7 @@ class Database:
             self.connection.set_isolation_level(1)   # go back to normal isolation level
         self.commit()   # seems to clear up errors if there were any in postgres
         atime = time() - stime
-        print (_("After import took %s seconds" % atime))
+        print (_("After import took %s seconds") % atime)
     #end def afterBulkImport
 
     def drop_referential_integrity(self):
@@ -1423,22 +1423,22 @@ class Database:
                 if cons:
                     pass
                 else:
-                    print _("creating foreign key "), fk['fktab'], fk['fkcol'], "->", fk['rtab'], fk['rcol']
+                    print _("Creating foreign key "), fk['fktab'], fk['fkcol'], "->", fk['rtab'], fk['rcol']
                     try:
                         c.execute("alter table " + fk['fktab'] + " add foreign key ("
                                   + fk['fkcol'] + ") references " + fk['rtab'] + "("
                                   + fk['rcol'] + ")")
                     except:
-                        print _("    create foreign key failed: ") + str(sys.exc_info())
+                        print _("Create foreign key failed: ") + str(sys.exc_info())
             elif self.backend == self.PGSQL:
-                print _("creating foreign key "), fk['fktab'], fk['fkcol'], "->", fk['rtab'], fk['rcol']
+                print _("Creating foreign key "), fk['fktab'], fk['fkcol'], "->", fk['rtab'], fk['rcol']
                 try:
                     c.execute("alter table " + fk['fktab'] + " add constraint "
                               + fk['fktab'] + '_' + fk['fkcol'] + '_fkey'
                               + " foreign key (" + fk['fkcol']
                               + ") references " + fk['rtab'] + "(" + fk['rcol'] + ")")
                 except:
-                    print _("   create foreign key failed: ") + str(sys.exc_info())
+                    print _("Create foreign key failed: ") + str(sys.exc_info())
             else:
                 print _("Only MySQL and Postgres supported so far")
 
@@ -1519,6 +1519,7 @@ class Database:
         c.execute("INSERT INTO Sites (name,code) VALUES ('Betfair', 'BF')")
         c.execute("INSERT INTO Sites (name,code) VALUES ('Absolute', 'AB')")
         c.execute("INSERT INTO Sites (name,code) VALUES ('PartyPoker', 'PP')")
+        c.execute("INSERT INTO Sites (name,code) VALUES ('PacificPoker', 'P8')")
         c.execute("INSERT INTO Sites (name,code) VALUES ('Partouche', 'PA')")
         c.execute("INSERT INTO Sites (name,code) VALUES ('Carbon', 'CA')")
         c.execute("INSERT INTO Sites (name,code) VALUES ('PKR', 'PK')")
@@ -2359,8 +2360,9 @@ class Database:
 
     def createOrUpdateTourney(self, hand, source):#note: this method is used on Hand and TourneySummary objects
         cursor = self.get_cursor()
-        cursor.execute (self.sql.query['getTourneyByTourneyNo'].replace('%s', self.sql.query['placeholder']),
-                        (hand.siteId, hand.tourNo))
+        q = self.sql.query['getTourneyByTourneyNo'].replace('%s', self.sql.query['placeholder'])
+        cursor.execute(q, (hand.siteId, hand.tourNo))
+
         columnNames=[desc[0] for desc in cursor.description]
         result=cursor.fetchone()
 
@@ -2385,9 +2387,12 @@ class Database:
                     #    if (resultDict[ev] < hand.startTime):
                     #        hand.startTime=resultDict[ev]
                 if updateDb:
-                    cursor.execute (self.sql.query['updateTourney'].replace('%s', self.sql.query['placeholder']),
-                           (hand.entries, hand.prizepool, hand.startTime, hand.endTime, hand.tourneyName,
-                            hand.matrixIdProcessed, hand.totalRebuyCount, hand.totalAddOnCount, hand.comment, hand.commentTs, tourneyId))
+                    q = self.sql.query['updateTourney'].replace('%s', self.sql.query['placeholder'])
+                    row = (hand.entries, hand.prizepool, hand.startTime, hand.endTime, hand.tourneyName,
+                            hand.matrixIdProcessed, hand.totalRebuyCount, hand.totalAddOnCount, hand.comment,
+                            hand.commentTs, tourneyId
+                          )
+                    cursor.execute(q, row)
         else:
             if source=="HHC":
                 cursor.execute (self.sql.query['insertTourney'].replace('%s', self.sql.query['placeholder']),
@@ -2436,9 +2441,19 @@ class Database:
                         elif getattr(hand, handAttribute)[player]!=None and resultDict[ev]==None:#object has this value but DB doesnt, so update DB
                             updateDb=True
                     if updateDb:
-                        cursor.execute (self.sql.query['updateTourneysPlayer'].replace('%s', self.sql.query['placeholder']),
-                               (hand.ranks[player], hand.winnings[player], hand.winningsCurrency[player],
-                                 hand.rebuyCounts[player], hand.addOnCounts[player], hand.koCounts[player], tourneysPlayersIds[player[1]]))
+                        q = self.sql.query['updateTourneysPlayer'].replace('%s', self.sql.query['placeholder'])
+                        inputs = (hand.ranks[player],
+                                  hand.winnings[player],
+                                  hand.winningsCurrency[player],
+                                  hand.rebuyCounts[player],
+                                  hand.addOnCounts[player],
+                                  hand.koCounts[player],
+                                  tourneysPlayersIds[player[1]]
+                                 )
+                        #print q
+                        #pp = pprint.PrettyPrinter(indent=4)
+                        #pp.pprint(inputs)
+                        cursor.execute(q, inputs)
             else:
                 if source=="HHC":
                     cursor.execute (self.sql.query['insertTourneysPlayer'].replace('%s', self.sql.query['placeholder']),

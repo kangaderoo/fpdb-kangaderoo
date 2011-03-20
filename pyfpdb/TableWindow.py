@@ -8,7 +8,7 @@ The class queries the poker client window for data of interest, such as
 size and location. It also controls the signals to alert the HUD when the
 client has been resized, destroyed, etc.
 """
-#    Copyright 2008 - 2010, Ray E. Barker
+#    Copyright 2008 - 2011, Ray E. Barker
 
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,9 @@ client has been resized, destroyed, etc.
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 ########################################################################
+
+import L10n
+_ = L10n.get_translation()
 
 #    Standard Library modules
 import re
@@ -66,7 +69,7 @@ bad_words = ('History for table:', 'HUD:', 'Chat:', 'FPDBHUD')
 
 #    Here are the custom signals we define for allowing the 'client watcher'
 #    thread to communicate with the gui thread. Any time a poker client is
-#    is moved, resized, or closed on of these signals is emitted to the
+#    is moved, resized, or closed one of these signals is emitted to the
 #    HUD main window.
 gobject.signal_new("client_moved", gtk.Window,
                    gobject.SIGNAL_RUN_LAST,
