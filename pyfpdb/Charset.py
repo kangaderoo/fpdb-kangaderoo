@@ -26,9 +26,7 @@ import Configuration
 
 encoder_to_utf = codecs.lookup('utf-8')
 encoder_to_sys = codecs.lookup(Configuration.LOCALE_ENCODING)
-coder_hex      = codecs.lookup('hex_codec')
 
-hex_coding = False      #FIXME: Should only be on if db is not UTF8 - test in Database.py?
 # I'm saving a few cycles with this one
 not_needed1, not_needed2, not_needed3 = False, False, False
 if Configuration.LOCALE_ENCODING == 'UTF8':
@@ -42,10 +40,10 @@ def to_utf8(s):
         _out = unicode(s, Configuration.LOCALE_ENCODING).encode('utf-8')
         return _out
     except UnicodeDecodeError:
-        sys.stderr.write(_('Could not convert: "%s"\n') % s)
+        sys.stderr.write(_('Could not convert: "%s"') % (s+"\n"))
         raise
     except UnicodeEncodeError:
-        sys.stderr.write(_('Could not encode: "%s"\n') % s)
+        sys.stderr.write(_('Could not encode: "%s"') % (s+"\n"))
         raise
     except TypeError: # TypeError is raised when we give unicode() an already encoded string
         return s
@@ -57,10 +55,10 @@ def to_db_utf8(s):
         (_out, _len) = encoder_to_utf.encode(unicode(s))
         return _out
     except UnicodeDecodeError:
-        sys.stderr.write(_('Could not convert: "%s"\n') % s)
+        sys.stderr.write(_('Could not convert: "%s"') % (s+"\n"))
         raise
     except UnicodeEncodeError:
-        sys.stderr.write(_('Could not encode: "%s"\n') % s)
+        sys.stderr.write(_('Could not encode: "%s"') % (s+"\n"))
         raise
 
 def to_gui(s):
@@ -72,24 +70,8 @@ def to_gui(s):
         (_out, _len) = encoder_to_sys.encode(s, 'replace')
         return _out
     except UnicodeDecodeError:
-        sys.stderr.write(_('Could not convert: "%s"\n') % s)
+        sys.stderr.write(_('Could not convert: "%s"') % (s+"\n"))
         raise
     except UnicodeEncodeError:
-        sys.stderr.write(_('Could not encode: "%s"\n') % s)
+        sys.stderr.write(_('Could not encode: "%s"') % (s+"\n"))
         raise
-
-def to_hex(s):
-    try:
-        out = coder_hex.encode(s)[0]
-        return out
-    except UnicodeDecodeError:
-        sys.stderr.write(_('Could not convert: "%s"\n') % s)
-        return s
-
-def from_hex(s):
-    try:
-        out = coder_hex.decode(s)[0]
-        return out
-    except UnicodeDecodeError:
-        sys.stderr.write(_('Could not convert: "%s"\n') % s)
-        return s

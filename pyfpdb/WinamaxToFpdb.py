@@ -403,13 +403,13 @@ class Winamax(HandHistoryConverter):
             elif action.group('ATYPE') == ' stands pat':
                 hand.addStandsPat( street, action.group('PNAME'))
             else:
-                log.fatal(_("DEBUG: ") + _("Unimplemented readAction: '%s' '%s'") % (action.group('PNAME'), action.group('ATYPE')))
+                log.fatal(_("DEBUG:") + _("Unimplemented %s: '%s' '%s'") % ("readAction", action.group('PNAME'), action.group('ATYPE')))
 #            print "Processed %s"%acts
 #            print "committed=",hand.pot.committed
 
     def readShowdownActions(self, hand):
         for shows in self.re_ShowdownAction.finditer(hand.handText):
-            log.debug(_("add show actions %s") % shows)
+            #log.debug(_("add show actions %s") % shows)
             cards = shows.group('CARDS')
             cards = cards.split(' ')
 #            print "DEBUG: addShownCards(%s, %s)" %(cards, shows.group('PNAME'))

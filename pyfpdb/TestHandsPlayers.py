@@ -77,17 +77,17 @@ def compare_gametypes_file(filename, importer, errors):
     handlist = hhc.getProcessedHands()
 
     lookup = {
-                0:'siteId',
-                1:'currency',
-                2:'type',
-                3:'base',
-                4:'game',
-                5:'limit',
-                6:'hilo',
-                7:'Small Blind',
-                8:'Big Blind',
-                9:'Small Bet',
-                10:'Big Bet',
+                0:'Gametype: siteId',
+                1:'Gametype: currency',
+                2:'Gametype: type',
+                3:'Gametype: base',
+                4:'Gametype: game',
+                5:'Gametype: limit',
+                6:'Gametype: hilo',
+                7:'Gametype: Small Blind',
+                8:'Gametype: Big Blind',
+                9:'Gametype: Small Bet',
+                10:'Gametype: Big Bet',
             }
 
     for hand in handlist:
@@ -127,7 +127,7 @@ def compare_handsplayers_file(filename, importer, errors):
                         # The stats match - continue
                         pass
                     else:
-                        if stat == 'tourneyTypeId' or stat == 'tourneysPlayersIds':
+                        if stat == 'tourneyTypeId' or stat == 'tourneysPlayersIds' or stat == 'showed':
                             # Not and error
                             pass
                         else:
@@ -153,6 +153,7 @@ def compare_hands_file(filename, importer, errors):
         del ghash['gsc']
         del ghash['sc']
         del ghash['id']
+        del ghash['boards']
         for datum in ghash:
             #print "DEBUG: hand: '%s'" % datum
             try:
@@ -161,7 +162,12 @@ def compare_hands_file(filename, importer, errors):
                     pass
                 else:
                     # Stats don't match. 
-                    if datum == "gametypeId" or datum == 'sessionId' or datum == 'tourneyId' or datum == 'gameSessionId':
+                    if (datum == "gametypeId" 
+                        or datum == 'sessionId' 
+                        or datum == 'tourneyId' 
+                        or datum == 'gameSessionId'
+                        or datum == 'fileId'
+                        or datum == 'runIt'):
                         # Not an error. gametypeIds are dependent on the order added to the db.
                         #print "DEBUG: Skipping mismatched gamtypeId"
                         pass
@@ -380,9 +386,6 @@ def main(argv=None):
     for i, site in enumerate(ErrorsList):
         totalerrors += ErrorsList[i].errorcount
 
-    print "---------------------"
-    print "Total Errors: %d" % totalerrors
-    print "---------------------"
     for i, site in enumerate(ErrorsList):
         ErrorsList[i].print_histogram()
 
@@ -407,6 +410,9 @@ def main(argv=None):
     for num, stat in sortedstats:
         print "(%3d) : %s" %(num, stat)
 
+    print "---------------------"
+    print "Total Errors: %d" % totalerrors
+    print "---------------------"
 
 if __name__ == '__main__':
     sys.exit(main())
